@@ -56,9 +56,10 @@ def make_order(store):
     try:
         total_price = store.order(shopping_list)
         print(f"\nOrder successful! Total price: {total_price} dollars.")
-    except Exception as error:  # fallback for unexpected errors
-        print(f"Order failed: {error}")
-
+    except ValueError as val_error:
+        print(f"Invalid quantity: {val_error}")
+    except RuntimeError as runtime_error:
+        print(f"Order processing error: {runtime_error}")
 
 def start(store):
     """Starts the interactive menu for the store."""
