@@ -1,48 +1,89 @@
-class Product:
-    """
-    This module defines the Product class.
-    It represents a single product in the store, with name, price, quantity, and active status.
-    It includes methods to buy products, update quantity, and show product details.
-    """
+"""
+Main user interface module for BestBuy store.
+Sets up the initial inventory and provides a menu for interacting with the store.
+Users can list products, check total quantity, place orders, or exit the program.
+"""
 
-    def __init__(self, name, price, quantity):
-        if not name or price < 0 or quantity < 0:
-            raise ValueError("Invalid product data: Name can't be empty, price and quantity have to be ≥ 0 ")
-        self.name = name
-        self.price = price
-        self.quantity = quantity
-        self.active = True
+from products import Product
+from store import Store
 
-    def get_quantity(self):
-        return self.quantity
+# Setup initial stock of inventory
+product_list = [
+    Product("MacBook Air M2", price=1450, quantity=100),
+    Product("Bose QuietComfort Earbuds", price=250, quantity=500),
+    Product("Google Pixel 7", price=500, quantity=250),
+]
 
-    def set_quantity(self, quantity):
-        if quantity < 0:
-            raise ValueError("Quantity must be greater than zero.")
-        self.quantity = quantity
-        if self.quantity == 0:
-            self.deactivate()
+best_buy = Store(product_list)
 
-    def is_active(self):
-        return self.active
 
-    def activate(self):
-        self.active = True
+def list_products(store):
+    """Displays all active products in the store."""
+    print("\nAvailable Products:")
+    for product in store.get_all_products():
+        product.show()
 
-    def deactivate(self):
-        self.active = False
 
-    def show(self):
-        print(f"{self.name}, Price: {self.price}, Quantity: {self.quantity}")
+def show_total(store):
+    """Displays total quantity of all products in the store."""
+    total = store.get_total_quantity()
+    print(f"\nTotal quantity in store: {total}")
 
-    def buy(self, quantity):
-        if not self.active:
-            raise Exception("Product is not active.")
-        if quantity <= 0:
-            raise ValueError("Quantity must be greater than zero.")
-        if quantity > self.quantity:
-            raise Exception("Not enough product available.")
-        self.quantity -= quantity
-        if self.quantity == 0:
-            self.deactivate()
-        return self.price * quantity
+
+def make_order(store):
+    """Handles the order process from user input."""
+    print("\nEnter your order:")
+    active_products = store.get_all_products()
+    shopping_list = []
+
+    for i, product in enumerate(active_products):
+        print(f"{i + 1}. {product.name} (Available: {product.get_quantity()})")
+
+    while True:
+        selection = input("Select product number (or 'done' to finish): ")
+        if selection.lower() == "done":
+            break
+        try:
+            index = int(selection) - 1
+            if index < 0 or index >= len(active_products):
+                print("Invalid product number.")
+                continue
+            quantity = int(input(f"Enter quantity for {active_products[index].name}: "))
+            shopping_list.append((active_products[index], quantity))
+        except ValueError as error:
+            print(f"Invalid input: {error}")
+
+    try:
+        total_price = store.order(shopping_list)
+        print(f"\nOrder successful! Total price: {total_price} dollars.")
+    except Exception as error:  # fallback for unexpected errors
+        print(f"Order failed: {error}")
+
+def start(store):
+    """Starts the interactive menu for the store."""
+    while True:
+        print("\n--- BestBuy Store Menu ---")
+        print("1. List all products in store")
+        print("2. Show total amount in store")
+        print("3. Make an order")
+        print("4. Quit")
+
+        choice = input("Enter your choice (1-4): ")
+
+        if choice == "1":
+            list_products(store)
+        elif choice == "2":
+            show_total(store)
+        elif choice == "3":
+            make_order(store)
+        elif choice == "4":
+            print("Thank you for visiting BestBuy. Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please select a number between 1 and 4.")
+
+
+if __name__ == "__main__":
+    start(best_buy)
+
+
