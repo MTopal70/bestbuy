@@ -1,10 +1,5 @@
 from products import Product
 from store import Store
-"""
- This is the main user interface module.
- It sets up the initial inventory and provides a menu for interacting with the store.
- Users can list products, check total quantity, place orders, or exit the program.
-"""
 
 # Setup initial stock of inventory
 product_list = [
@@ -16,6 +11,11 @@ product_list = [
 best_buy = Store(product_list)
 
 def start(store):
+    """
+    Starts the interactive menu for the store.
+    Allows users to list products, check total quantity, place orders, or quit.
+    """
+
     while True:
         print("\n--- BestBuy Store Menu ---")
         print("1. List all products in store")
