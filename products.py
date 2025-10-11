@@ -1,7 +1,13 @@
 class Product:
+    """
+    This module defines the Product class.
+    It represents a single product in the store, with name, price, quantity, and active status.
+    It includes methods to buy products, update quantity, and show product details.
+    """
+
     def __init__(self, name, price, quantity):
         if not name or price < 0 or quantity < 0:
-            raise ValueError("Ungültige Produktdaten: Name darf nicht leer sein, Preis und Menge müssen ≥ 0 sein.")
+            raise ValueError("Invalid product data: Name can't be empty, price and quantity have to be ≥ 0 ")
         self.name = name
         self.price = price
         self.quantity = quantity
@@ -12,7 +18,7 @@ class Product:
 
     def set_quantity(self, quantity):
         if quantity < 0:
-            raise ValueError("Menge darf nicht negativ sein.")
+            raise ValueError("Quantity must be greater than zero.")
         self.quantity = quantity
         if self.quantity == 0:
             self.deactivate()
@@ -31,12 +37,12 @@ class Product:
 
     def buy(self, quantity):
         if not self.active:
-            raise Exception("Produkt ist nicht aktiv.")
+            raise Exception("Product is not active.")
         if quantity <= 0:
-            raise ValueError("Kaufmenge muss positiv sein.")
+            raise ValueError("Quantity must be greater than zero.")
         if quantity > self.quantity:
-            raise Exception("Nicht genügend Lagerbestand.")
+            raise Exception("Not enough product available.")
         self.quantity -= quantity
         if self.quantity == 0:
             self.deactivate()
-        return self.price * quantityx
+        return self.price * quantity

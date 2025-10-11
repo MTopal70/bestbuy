@@ -1,6 +1,12 @@
 from products import Product
 
 class Store:
+    """
+    This module defines the Store class.
+    It manages a list of Product instances and allows adding/removing products.
+    It can calculate total quantity and process multi-product orders.
+    """
+
     def __init__(self, products=None):
         if products is None:
             products = []
@@ -10,7 +16,7 @@ class Store:
         if isinstance(product, Product):
             self.products.append(product)
         else:
-            raise TypeError("Nur Product-Instanzen können hinzugefügt werden.")
+            raise TypeError("Only Products can be added.")
 
     def remove_product(self, product):
         if product in self.products:
