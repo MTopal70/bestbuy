@@ -1,8 +1,9 @@
-"""
-Main user interface module for BestBuy store.
-Sets up the initial inventory and provides a menu for interacting with the store.
-Users can list products, check total quantity, place orders, or exit the program.
-"""
+class Product:
+    """
+    Main user interface module for BestBuy store.
+    Sets up the initial inventory and provides a menu for interacting with the store.
+    Users can list products, check total quantity, place orders, or exit the program.
+    """
 
 from products import Product
 from store import Store
