@@ -4,7 +4,7 @@ Sets up the initial inventory and provides a menu for interacting with the store
 Users can list products, check total quantity, place orders, or exit the program.
 """
 
-from products import Product
+from products import Product, OutOfStockError
 from store import Store
 
 # Setup initial stock of inventory
@@ -49,6 +49,12 @@ def make_order(store):
                 print("Invalid product number.")
                 continue
             quantity = int(input(f"Enter quantity for {active_products[index].name}: "))
+            if quantity <= 0:
+                print("Quantity must be greater than zero.")
+                continue
+            if quantity > active_products[index].get_quantity():
+                print("Requested quantity exceeds available stock.")
+                continue
             shopping_list.append((active_products[index], quantity))
         except ValueError as error:
             print(f"Invalid input: {error}")
@@ -56,10 +62,13 @@ def make_order(store):
     try:
         total_price = store.order(shopping_list)
         print(f"\nOrder successful! Total price: {total_price} dollars.")
+    except OutOfStockError as stock_error:
+        print(f"Stock issue: {stock_error}")
     except ValueError as val_error:
         print(f"Invalid quantity: {val_error}")
-    except RuntimeError as runtime_error:
-        print(f"Order processing error: {runtime_error}")
+    except Exception as error:
+        print(f"Unexpected error: {error}")
+
 
 def start(store):
     """Starts the interactive menu for the store."""
@@ -87,3 +96,4 @@ def start(store):
 
 if __name__ == "__main__":
     start(best_buy)
+

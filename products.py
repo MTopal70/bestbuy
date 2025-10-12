@@ -1,90 +1,56 @@
+class OutOfStockError(Exception):
+    """Custom exception raised when requested quantity exceeds available stock."""
+    pass
+
+
 class Product:
     """
-    Main user interface module for BestBuy store.
-    Sets up the initial inventory and provides a menu for interacting with the store.
-    Users can list products, check total quantity, place orders, or exit the program.
+    Represents a product in the BestBuy store.
+
+    Attributes:
+        name (str): Name of the product.
+        price (float): Price per unit.
+        quantity (int): Available stock.
+        active (bool): Whether the product is active and available for sale.
     """
 
-from products import Product
-from store import Store
+    def __init__(self, name, price, quantity):
+        self.name = name
+        self.price = price
+        self.quantity = quantity
+        self.active = True
 
-# Setup initial stock of inventory
-product_list = [
-    Product("MacBook Air M2", price=1450, quantity=100),
-    Product("Bose QuietComfort Earbuds", price=250, quantity=500),
-    Product("Google Pixel 7", price=500, quantity=250),
-]
+    def buy(self, amount):
+        """
+        Attempts to purchase a given quantity of the product.
 
-best_buy = Store(product_list)
+        Args:
+            amount (int): Quantity to purchase.
 
+        Returns:
+            float: Total price for the purchase.
 
-def list_products(store):
-    """Displays all active products in the store."""
-    print("\nAvailable Products:")
-    for product in store.get_all_products():
-        product.show()
+        Raises:
+            OutOfStockError: If requested amount exceeds available quantity.
+            ValueError: If amount is not positive.
+        """
+        if amount <= 0:
+            raise ValueError("Purchase quantity must be positive.")
+        if amount > self.quantity:
+            raise OutOfStockError(
+                f"Not enough stock for '{self.name}'. Requested: {amount}, Available: {self.quantity}"
+            )
+        self.quantity -= amount
+        return self.price * amount
 
+    def get_quantity(self):
+        """Returns the current quantity of the product."""
+        return self.quantity
 
-def show_total(store):
-    """Displays total quantity of all products in the store."""
-    total = store.get_total_quantity()
-    print(f"\nTotal quantity in store: {total}")
+    def is_active(self):
+        """Returns True if the product is active and has stock."""
+        return self.active and self.quantity > 0
 
-
-def make_order(store):
-    """Handles the order process from user input."""
-    print("\nEnter your order:")
-    active_products = store.get_all_products()
-    shopping_list = []
-
-    for i, product in enumerate(active_products):
-        print(f"{i + 1}. {product.name} (Available: {product.get_quantity()})")
-
-    while True:
-        selection = input("Select product number (or 'done' to finish): ")
-        if selection.lower() == "done":
-            break
-        try:
-            index = int(selection) - 1
-            if index < 0 or index >= len(active_products):
-                print("Invalid product number.")
-                continue
-            quantity = int(input(f"Enter quantity for {active_products[index].name}: "))
-            shopping_list.append((active_products[index], quantity))
-        except ValueError as error:
-            print(f"Invalid input: {error}")
-
-    try:
-        total_price = store.order(shopping_list)
-        print(f"\nOrder successful! Total price: {total_price} dollars.")
-    except Exception as error:  # fallback for unexpected errors
-        print(f"Order failed: {error}")
-
-def start(store):
-    """Starts the interactive menu for the store."""
-    while True:
-        print("\n--- BestBuy Store Menu ---")
-        print("1. List all products in store")
-        print("2. Show total amount in store")
-        print("3. Make an order")
-        print("4. Quit")
-
-        choice = input("Enter your choice (1-4): ")
-
-        if choice == "1":
-            list_products(store)
-        elif choice == "2":
-            show_total(store)
-        elif choice == "3":
-            make_order(store)
-        elif choice == "4":
-            print("Thank you for visiting BestBuy. Goodbye!")
-            break
-        else:
-            print("Invalid choice. Please select a number between 1 and 4.")
-
-
-if __name__ == "__main__":
-    start(best_buy)
-
-
+    def show(self):
+        """Displays product details."""
+        print(f"{self.name}, Price: ${self.price}, Quantity: {self.quantity}")
