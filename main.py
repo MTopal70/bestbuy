@@ -29,6 +29,12 @@ def show_total(store):
     total = store.get_total_quantity()
     print(f"\nTotal quantity in store: {total}")
 
+def is_valid_int(value):
+    try:
+        int(value)
+        return True
+    except ValueError:
+        return False
 
 def make_order(store):
     """Handles the order process from user input."""
@@ -43,21 +49,29 @@ def make_order(store):
         selection = input("Select product number (or 'done' to finish): ")
         if selection.lower() == "done":
             break
+        else:
+            if not is_valid_int(selection):
+                print("\nPlease enter a valid number.")
+                continue
         try:
             index = int(selection) - 1
             if index < 0 or index >= len(active_products):
                 print("Invalid product number.")
-                continue
+                break
             quantity = int(input(f"Enter quantity for {active_products[index].name}: "))
-            if quantity <= 0:
-                print("Quantity must be greater than zero.")
+            if not is_valid_int(quantity):
+                print("\nPlease enter a valid number.")
                 continue
-            if quantity > active_products[index].get_quantity():
-                print("Requested quantity exceeds available stock.")
-                continue
+            else:
+                if quantity <= 0:
+                    print("Quantity must be greater than zero.")
+                    continue
+                if quantity > active_products[index].get_quantity():
+                    print("Requested quantity exceeds available stock.")
+                    continue
             shopping_list.append((active_products[index], quantity))
         except ValueError as error:
-            print(f"Invalid input: {error}")
+            print(f"Invalid input: ")
 
     try:
         total_price = store.order(shopping_list)
@@ -96,4 +110,5 @@ def start(store):
 
 if __name__ == "__main__":
     start(best_buy)
+
 
