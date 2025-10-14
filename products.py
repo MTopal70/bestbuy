@@ -6,34 +6,22 @@ class OutOfStockError(Exception):
 class Product:
     """
     Represents a product in the BestBuy store.
-
-    Attributes:
-        name (str): Name of the product.
-        price (float): Price per unit.
-        quantity (int): Available stock.
-        active (bool): Whether the product is active and available for sale.
     """
 
     def __init__(self, name, price, quantity):
+        if not name or not name.strip():
+            raise ValueError("Product name cannot be empty.")
+        if price < 0:
+            raise ValueError("Price cannot be negative.")
+        if quantity < 0:
+            raise ValueError("Quantity cannot be negative.")
+
         self.name = name
         self.price = price
         self.quantity = quantity
         self.active = True
 
     def buy(self, amount):
-        """
-        Attempts to purchase a given quantity of the product.
-
-        Args:
-            amount (int): Quantity to purchase.
-
-        Returns:
-            float: Total price for the purchase.
-
-        Raises:
-            OutOfStockError: If requested amount exceeds available quantity.
-            ValueError: If amount is not positive.
-        """
         if amount <= 0:
             raise ValueError("Purchase quantity must be positive.")
         if amount > self.quantity:
@@ -41,16 +29,29 @@ class Product:
                 f"Not enough stock for '{self.name}'. Requested: {amount}, Available: {self.quantity}"
             )
         self.quantity -= amount
+        if self.quantity == 0:
+            self.deactivate()
         return self.price * amount
 
     def get_quantity(self):
-        """Returns the current quantity of the product."""
         return self.quantity
 
     def is_active(self):
-        """Returns True if the product is active and has stock."""
-        return self.active and self.quantity > 0
+        return self.active
+
+    def set_quantity(self, quantity):
+        if quantity < 0:
+            raise ValueError("Quantity cannot be negative.")
+        self.quantity = quantity
+        if self.quantity == 0:
+            self.deactivate()
+
+    def activate(self):
+        self.active = True
+
+    def deactivate(self):
+        self.active = False
 
     def show(self):
-        """Displays product details."""
         print(f"{self.name}, Price: ${self.price}, Quantity: {self.quantity}")
+

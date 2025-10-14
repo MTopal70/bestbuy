@@ -49,29 +49,22 @@ def make_order(store):
         selection = input("Select product number (or 'done' to finish): ")
         if selection.lower() == "done":
             break
-        else:
-            if not is_valid_int(selection):
-                print("\nPlease enter a valid number.")
-                continue
         try:
             index = int(selection) - 1
             if index < 0 or index >= len(active_products):
                 print("Invalid product number.")
-                break
-            quantity = int(input(f"Enter quantity for {active_products[index].name}: "))
-            if not is_valid_int(quantity):
-                print("\nPlease enter a valid number.")
                 continue
-            else:
-                if quantity <= 0:
-                    print("Quantity must be greater than zero.")
-                    continue
-                if quantity > active_products[index].get_quantity():
-                    print("Requested quantity exceeds available stock.")
-                    continue
+            quantity = int(input(f"Enter quantity for {active_products[index].name}: "))
+            if quantity <= 0:
+                print("Quantity must be greater than zero.")
+                continue
+            if quantity > active_products[index].get_quantity():
+                print("Requested quantity exceeds available stock.")
+                continue
             shopping_list.append((active_products[index], quantity))
-        except ValueError as error:
-            print(f"Invalid input: ")
+        except ValueError:
+            print("Please enter a valid number.")
+            continue
 
     try:
         total_price = store.order(shopping_list)
