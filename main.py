@@ -7,7 +7,7 @@ Users can list products, check total quantity, place orders, or exit the program
 from products import Product, OutOfStockError
 from store import Store
 
-# Setup initial stock of inventory
+# Initial inventory
 product_list = [
     Product("MacBook Air M2", price=1450, quantity=100),
     Product("Bose QuietComfort Earbuds", price=250, quantity=500),
@@ -16,36 +16,28 @@ product_list = [
 
 best_buy = Store(product_list)
 
-
 def list_products(store):
-    """Displays all active products in the store."""
+    """Displays all active products."""
     print("\nAvailable Products:")
     for product in store.get_all_products():
         product.show()
 
-
 def show_total(store):
-    """Displays total quantity of all products in the store."""
+    """Displays total quantity in store."""
     total = store.get_total_quantity()
     print(f"\nTotal quantity in store: {total}")
 
-def is_valid_int(value):
-    try:
-        int(value)
-        return True
-    except ValueError:
-        return False
-
 def make_order(store):
-    """Handles the order process from user input."""
+    """Handles user order input."""
     print("\nEnter your order:")
-    active_products = store.get_all_products()
     shopping_list = []
 
-    for i, product in enumerate(active_products):
-        print(f"{i + 1}. {product.name} (Available: {product.get_quantity()})")
-
     while True:
+        active_products = store.get_all_products()  # Refresh product list each time
+        print("\nAvailable Products:")
+        for i, product in enumerate(active_products):
+            print(f"{i + 1}. {product.name} (Available: {product.get_quantity()})")
+
         selection = input("Select product number (or 'done' to finish): ")
         if selection.lower() == "done":
             break
@@ -54,17 +46,34 @@ def make_order(store):
             if index < 0 or index >= len(active_products):
                 print("Invalid product number.")
                 continue
-            quantity = int(input(f"Enter quantity for {active_products[index].name}: "))
+
+            product = active_products[index]
+            quantity = int(input(f"Enter quantity for {product.name}: "))
             if quantity <= 0:
                 print("Quantity must be greater than zero.")
                 continue
-            if quantity > active_products[index].get_quantity():
-                print("Requested quantity exceeds available stock.")
+            # Calculate already ordered amount of the product
+            already_ordered = sum(qty for p, qty in shopping_list if p == product)
+            available = product.get_quantity() - already_ordered
+
+            if quantity > available:
+                print(
+                    f"Only {available} units available (after {already_ordered} already in cart). Cannot add {quantity}.")
                 continue
-            shopping_list.append((active_products[index], quantity))
+
+            shopping_list.append((product, quantity))
+            print(f"Added {quantity} x {product.name} to your cart.")
         except ValueError:
             print("Please enter a valid number.")
             continue
+
+    if not shopping_list:
+        print("\n🛒 No items in cart. Order cancelled.")
+        return
+
+    print("\n🛒 Your shopping cart:")
+    for product, qty in shopping_list:
+        print(f"- {qty} x {product.name}")
 
     try:
         total_price = store.order(shopping_list)
@@ -76,9 +85,8 @@ def make_order(store):
     except Exception as error:
         print(f"Unexpected error: {error}")
 
-
 def start(store):
-    """Starts the interactive menu for the store."""
+    """Starts the interactive CLI menu."""
     while True:
         print("\n--- BestBuy Store Menu ---")
         print("1. List all products in store")
@@ -100,8 +108,8 @@ def start(store):
         else:
             print("Invalid choice. Please select a number between 1 and 4.")
 
-
 if __name__ == "__main__":
     start(best_buy)
+
 
 

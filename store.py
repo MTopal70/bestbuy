@@ -2,7 +2,9 @@ from products import Product, OutOfStockError
 
 class Store:
     """
-    Manages a list of Product instances and allows adding/removing products.
+    Manages a collection of Product instances.
+    Provides methods to add/remove products, list active items,
+    calculate total quantity, and process orders.
     """
 
     def __init__(self, products=None):
