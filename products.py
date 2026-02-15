@@ -65,4 +65,43 @@ class Product:
         status = "Active" if self.active else "Inactive"
         print(f"{self.name} - ${self.price} ({self.quantity} in stock) [{status}]")
 
+class NonStockedProduct(Product):
+    """A product that has no physical stock (e.g., software license)."""
 
+    def __init__(self, name: str, price: float):
+        super().__init__(name, price, quantity=0)
+
+    def set_quantity(self, new_quantity: int):
+        """Non-stocked products always have quantity 0."""
+        self.quantity = 0
+
+    def buy(self, amount: int) -> float:
+        """Always available, since it's not a physical product."""
+        if amount <= 0:
+            raise ProductError("Purchase amount must be a positive integer.")
+        return self.price * amount
+
+    def show(self):
+        print(f"{self.name} - ${self.price} (Non-stocked product)")
+
+class LimitedProduct(Product):
+    """A product that can only be purchased up to a maximum amount per order."""
+
+    def __init__(self, name: str, price: float, quantity: int, maximum: int):
+        super().__init__(name, price, quantity)
+        if maximum <= 0:
+            raise ProductError("Maximum purchase limit must be a positive integer.")
+        self.maximum = maximum
+
+    def buy(self, amount: int) -> float:
+        if amount > self.maximum:
+            raise ProductError(
+                f"Cannot buy more than {self.maximum} units of {self.name} in one order."
+            )
+        return super().buy(amount)
+
+    def show(self):
+        print(
+            f"{self.name} - ${self.price} "
+            f"({self.quantity} in stock, max {self.maximum} per order)"
+        )

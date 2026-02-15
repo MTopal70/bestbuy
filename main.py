@@ -4,7 +4,7 @@ Sets up the initial inventory and provides a menu for interacting with the store
 Users can list products, check total quantity, place orders, or exit the program.
 """
 
-from products import Product, OutOfStockError
+from products import Product, OutOfStockError, NonStockedProduct, LimitedProduct
 from store import Store
 
 # Initial inventory
@@ -12,7 +12,11 @@ product_list = [
     Product("MacBook Air M2", price=1450, quantity=100),
     Product("Bose QuietComfort Earbuds", price=250, quantity=500),
     Product("Google Pixel 7", price=500, quantity=250),
+    NonStockedProduct("Windows License", price=125),
+    LimitedProduct("Shipping", price=10, quantity=250, maximum=1)
 ]
+
+
 
 best_buy = Store(product_list)
 
