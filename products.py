@@ -20,6 +20,7 @@ class Product:
         self.price = price
         self.quantity = quantity
         self.active = True
+        self.promotion = None
 
     def is_active(self) -> bool:
         """Returns whether the product is active."""
@@ -44,7 +45,6 @@ class Product:
         return self.quantity
 
     def buy(self, amount: int) -> float:
-        """Processes a purchase and deactivates if stock reaches zero."""
         if not self.active:
             raise ProductError("Cannot buy inactive product.")
         if not isinstance(amount, int) or amount <= 0:
@@ -52,8 +52,13 @@ class Product:
         if amount > self.quantity:
             raise OutOfStockError(f"Only {self.quantity} units available.")
 
+        # Apply promotion if exists
+        if self.promotion:
+            total_price = self.promotion.apply_promotion(self, amount)
+        else:
+            total_price = self.price * amount
+
         self.quantity -= amount
-        total_price = self.price * amount
 
         if self.quantity == 0:
             self.deactivate()
@@ -61,9 +66,15 @@ class Product:
         return total_price
 
     def show(self):
-        """Displays product details."""
         status = "Active" if self.active else "Inactive"
-        print(f"{self.name} - ${self.price} ({self.quantity} in stock) [{status}]")
+        promo = f" | Promotion: {self.promotion.name}" if self.promotion else ""
+        print(f"{self.name} - ${self.price} ({self.quantity} in stock) [{status}]{promo}")
+
+    def set_promotion(self, promotion):
+        self.promotion = promotion
+
+    def get_promotion(self):
+        return self.promotion
 
 class NonStockedProduct(Product):
     """A product that has no physical stock (e.g., software license)."""
